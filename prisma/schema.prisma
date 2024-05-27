@@ -1,0 +1,16 @@
+datasource db {
+  provider = "mysql"
+  url      = "mysql://root@127.0.0.1:3306/tsStudyDbPrism"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/client"
+}
