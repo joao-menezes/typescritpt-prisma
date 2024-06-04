@@ -16,7 +16,7 @@ const logger = createLogger({
     ]
 });
 
-const safePrint = (value: string) => {
+export const safePrint = (value: string) => {
     if(typeof value === "object") {
         const stringifiedObject = JSON.stringify(value);
         if (stringifiedObject === "{}") {

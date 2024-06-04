@@ -12,24 +12,31 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createUser = void 0;
+exports.loginUser = void 0;
 const client_1 = require("../prisma/generated/client");
 const logger_1 = __importDefault(require("../utils/logger"));
 const auth_1 = require("../middleware/auth");
 const prisma = new client_1.PrismaClient();
-const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { name, email, password } = req.body;
-        const criptoPass = yield (0, auth_1.cryptographyPass)(password);
-        const newUser = yield prisma.user.create({
-            data: { name, email, password: criptoPass },
-        });
-        const token = (0, auth_1.generateToken)(newUser.id);
-        res.json({ newUser, token });
+        const { email, password } = req.body;
+        if (!email || !password) {
+            return res.status(400).json({ error: 'Email e password são obrigatórios' });
+        }
+        const user = yield prisma.user.findUnique({ where: { email } });
+        if (!user) {
+            return res.status(401).json({ error: 'Email ou password inválidos' });
+        }
+        const passwordValida = yield (0, auth_1.comparePassword)(password, user.password);
+        if (!passwordValida) {
+            return res.status(401).json({ error: 'Email ou password inválidos' });
+        }
+        const token = (0, auth_1.generateToken)(user.id);
+        res.json({ user, token });
     }
     catch (error) {
-        logger_1.default.error('Error creating user:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        logger_1.default.error('Erro ao fazer login do usuário: ', error);
+        res.status(500).json({ error: 'Erro interno do servidor' });
     }
 });
-exports.createUser = createUser;
+exports.loginUser = loginUser;

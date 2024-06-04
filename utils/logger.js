@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.safePrint = void 0;
 const winston_1 = require("winston");
 const logger = (0, winston_1.createLogger)({
     level: 'info',
@@ -22,4 +23,5 @@ const safePrint = (value) => {
     }
     return value;
 };
+exports.safePrint = safePrint;
 exports.default = logger;
